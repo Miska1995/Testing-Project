@@ -1,0 +1,207 @@
+
+#******************** Settings ************************
+
+*** Settings ***
+
+# TODO: Write Documentation e.g. User Registration Test scenario with verification, valid and invalid credentials.
+
+Documentation	User Registration Test Scenario
+                This test suite includes tests to verify the user registration process with both valid and invalid data inputs.
+
+# TODO: Write Precondition, Postcondition, Tags
+
+Pre Condition
+Post Condition  
+Tags            
+
+
+#******************* Common Variables ********************
+
+*** Variables ***
+
+# NOTE: Please Remove your login credential before uploading Assignments
+
+# TODO: Write Registration field variables
+
+LoginUrl = https://gitlab.com/users/sign_up
+
+#******************** Test Cases *************************
+
+*** Test Case ***
+
+# TODO: Write Positive and Negative Test Cases and Test Process steps (Think about possible test cases)
+
+# Positive Test examples are below write test process steps for each below test case
+
+	Register user with valid username and password 
+	- Remember credentials which you are going to use for whole application testing 
+
+# Negative Test examples keywords are below write test process steps for each below test case 
+
+	Register user with same above username,
+		...empty password,
+		...invalid email,
+		...Without recaptcha,
+
+
+*MY PROJECT WORK STARTS HERE*
+
+*** Settings ***
+Library           SeleniumLibrary
+Suite Setup       Open Browser To Registration Page
+Suite Teardown    Close All Browsers
+Documentation     User Registration Test Scenario
+                  This test suite includes tests to verify the user registration process with both valid and invalid data inputs.
+...               Preconditions: User is on the Registration page.
+...               Postconditions: User is either registered and redirected to the dashboard or remains on the registration page with error messages.
+...               Tags: Registration, Positive, Negative, Validation
+
+*** Variables ***
+${LOGIN_URL}      https://gitlab.com/users/sign_up
+${DASHBOARD_URL}  https://gitlab.com/
+${VALID_USERNAME} %{GITLAB_USERNAME}
+${VALID_PASSWORD} %{GITLAB_PASSWORD}
+${USED_USERNAME}  %{GITLAB_USED_USERNAME}
+${INVALID_EMAIL}  user#gmail.com
+${VALID_EMAIL}    validuser@gmail.com
+${FIRST_NAME}     Bobby
+${SECOND_NAME}    Jones
+${EMPTY_PASSWORD} ${EMPTY}
+${BROWSER}        Microsoft Edge
+
+
+*** Test Cases ***
+
+Test Case-1 Register user with valid username and password
+    [Documentation]    Verify that a user can successfully register using a valid username and password, and is redirected to the dashboard.
+                        Tags: Registration, Positive, Validation
+                        Precondition: User must be on the Registration page.
+                        Test Data: Valid username (${VALID_USERNAME}) and password (${VALID_PASSWORD}).
+                        Process Test Steps:
+                        1. Input first name.
+                        2. Input second name.
+                        3. Input username.
+                        4. Input password.
+                        5. Input valid email.
+                        6. Click the register button.
+                        7. Wait for the page to redirect.
+                        8. Verify the redirection to the dashboard.
+                        Expected Result: User is redirected to the dashboard.
+                        [Placeholder for manual notes:
+                        Actual Result: I was redirected to the dashboard.
+                        Status: Pass]
+    [Tags]             Registration, Positive, Validation
+    Input Text         id=first_name  ${FIRST_NAME}
+    Input Text         id=second_name ${SECOND_NAME}
+    Input Text         id=username    ${VALID_USERNAME}
+    Input Text         id=password    ${VALID_PASSWORD}
+    Input Text         id=email       ${VALID_EMAIL}
+    Click Button       id=register
+    Wait For Condition    return window.location.href == '${DASHBOARD_URL}'
+    Location Should Be ${DASHBOARD_URL}
+
+Test Case-2 Register user with same above username
+    [Documentation]    Ensure the system prevents registration with a username that is already in use.
+                        Document: This test verifies that the system prevents duplicate usernames.
+                        Tags: Registration, Negative, Validation
+                        Precondition: User must be on the Registration page with previously used username.
+                        Test Data: Used username (${USED_USERNAME}) and valid password (${VALID_PASSWORD}).
+                        Process Test Steps:
+                        1. Input first name.
+                        2. Input second name.
+                        3. Input used username.
+                        4. Input password.
+                        5. Input valid email.
+                        6. Click the register button.
+                        7. Verify error message.
+                        Expected Result: Error message 'Username has already been taken' is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: I got a message displaying "Username has already been taken"
+                        Status: Pass]
+    [Tags]             Registration, Negative, Validation
+    Input Text         id=first_name  ${FIRST_NAME}
+    Input Text         id=second_name ${SECOND_NAME}
+    Input Text         id=username    ${USED_USERNAME}
+    Input Text         id=password    ${VALID_PASSWORD}
+    Input Text         id=email       ${VALID_EMAIL}
+    Click Button       id=register
+    Element Should Contain   css=.error    "Username has already been taken"
+
+Test Case-3 Register user with empty password
+    [Documentation]    Test that registration fails if the password field is left empty.
+                        Document: This test checks for the enforcement of password requirements.
+                        Tags: Registration, Negative, Validation
+                        Precondition: User must be on the Registration page.
+                        Test Data: Valid username (${VALID_USERNAME}) and empty password (${EMPTY_PASSWORD}).
+                        Process Test Steps:
+                        1. Input first name.
+                        2. Input second name.
+                        3. Input username.
+                        4. Input empty password.
+                        5. Click the register button.
+                        6. Verify error message.
+                        Expected Result: Error message 'Minimum length is 8 characters' is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: I got a message displaying "Minimum length is 8 characters."
+                        Status: Pass]
+    [Tags]             Registration, Negative, Validation
+    Input Text         id=first_name  ${FIRST_NAME}
+    Input Text         id=second_name ${SECOND_NAME}
+    Input Text         id=username    ${VALID_USERNAME}
+    Input Text         id=password    ${EMPTY_PASSWORD}
+    Click Button       id=register
+    Element Should Contain   css=.error    "Minimum length is 8 characters."
+
+Test Case-4 Register user with invalid email
+    [Documentation]    Verify the system rejects registration attempts with improperly formatted email addresses.
+                        Document: This test ensures proper validation of email formats.
+                        Tags: Registration, Negative, Validation
+                        Precondition: User must be on the Registration page.
+                        Test Data: Valid username (${VALID_USERNAME}) and password (${VALID_PASSWORD}) with invalid email (${INVALID_EMAIL}).
+                        Process Test Steps:
+                        1. Input first name.
+                        2. Input second name.
+                        3. Input username.
+                        4. Input password.
+                        5. Input invalid email.
+                        6. Click the register button.
+                        7. Verify error message.
+                        Expected Result: Error message 'Please provide a valid email address' is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: I got a message displaying "Please provide a valid email address"
+                        Status: Pass]
+    [Tags]             Registration, Negative, Validation
+    Input Text         id=first_name  ${FIRST_NAME}
+    Input Text         id=second_name ${SECOND_NAME}
+    Input Text         id=username    ${VALID_USERNAME}
+    Input Text         id=password    ${VALID_PASSWORD}
+    Input Text         id=email       ${INVALID_EMAIL}
+    Click Button       id=register
+    Element Should Contain   css=.error    "Please provide a valid email address."
+
+Test Case-5 Register user without reCAPTCHA
+    [Documentation]    Verify the system rejects registration attempts without completing reCAPTCHA.
+                        Document: This test ensures that reCAPTCHA is required for successful registration.
+                        Tags: Registration, Negative, Validation
+                        Precondition: User must be on the Registration page.
+                        Test Data: Valid username (${VALID_USERNAME}) and password (${VALID_PASSWORD}) but reCAPTCHA not completed.
+                        Process Test Steps:
+                        1. Input first name.
+                        2. Input last name.
+                        3. Input username.
+                        4. Input password.
+                        5. Leave reCAPTCHA unchecked.
+                        6. Click the register button.
+                        7. Verify error message.
+                        Expected Result: Error message 'complete verification to sign up' is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: I got a message displaying "complete verification to sign up"
+                        Status: Pass]
+    [Tags]             Registration, Negative, Validation
+    Input Text         id=first_name  ${FIRST_NAME}
+    Input Text         id=last_name   ${LAST_NAME}
+    Input Text         id=username    ${VALID_USERNAME}
+    Input Text         id=password    ${VALID_PASSWORD}
+    # Assuming the reCAPTCHA is typically interacted with via a frame or specific input, which we are skipping
+    Click Button       id=register
+    Element Should Contain   css=.error    "complete the verification to sign up"

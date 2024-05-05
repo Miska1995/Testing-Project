@@ -1,0 +1,149 @@
+
+#******************** Settings ************************
+
+*** Settings ***
+Documentation	Issue Test scenario. CRUD Operation: Create, Read, Update, Delete
+
+# TODO: Write Precondition and Postcondition, Tags 
+
+Pre Condition	Tips: Project must be created by the user before 
+Post Condition	
+Tags
+
+#******************* Common Variables ********************
+
+
+*** Variables ***
+
+# NOTE: Please Remove your login credential before uploading Assignments
+
+# TODO: Write Issue creation field variables, Updated name of the issue
+
+
+
+#******************** Test Cases *************************
+
+*** Test Case ***
+
+# TODO: Write Positive Test Cases and Test Process steps
+
+# Positive Test examples are below write test process steps for each below test case
+
+	Create issue,
+ 	Update name of issue, 
+	Create second issue with privious updated name
+    Delete first issue
+
+*MY PROJECT WORK STARTS HERE*
+
+*** Settings ***
+Library           SeleniumLibrary
+Suite Setup       Open Browser To Issues Page
+Suite Teardown    Close All Browsers
+Documentation     Issue Management Test Scenario
+...               This test suite performs CRUD operations on issues within a project, testing Create, Read, Update, Delete functionalities.
+...               Preconditions: A project must be created by the user before executing these tests.
+...               Postconditions: All test issues should be deleted; clean up any test data.
+...               Tags: Issue Management, CRUD
+
+*** Variables ***
+${LOGIN_URL}              https://gitlab.com/login
+${ISSUE_TRACKER_URL}      https://gitlab.com/projects/my-project/issues
+${FIRST_ISSUE_TITLE}      Initial Issue Title
+${UPDATED_ISSUE_TITLE}    Updated Issue Title
+${SECOND_ISSUE_TITLE}     Second Issue Title
+${BROWSER}                Microsoft Edge
+
+*** Test Cases ***
+
+Test Case-1 Create issue
+    [Documentation]    Verify that a user can successfully create a new issue within the project.
+                        Tags: Issue Management, CRUD, Create, Positive
+                        Precondition: User must be on the Issue page.
+                        Test Data: Issue title (${FIRST_ISSUE_TITLE}).
+                        Process Test Steps:
+                        1. Click 'Create New Issue'.
+                        2. Choose the desired project.
+                        3. Input the issue title.
+                        4. Submit the issue creation form.
+                        5. Verify the creation message.
+                        Expected Result: 'Issue successfully created' message is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: No confirmation message displayed. Checked the issue list and confirmed the issue was created.
+                        Status: Pass with observations]
+    [Tags]             CRUD, Create, Positive
+    Click Button       id=new_issue
+    Select List        id=project_selector    ${PROJECT_NAME}
+    Input Text         id=issue_title    ${FIRST_ISSUE_TITLE}
+    Click Button       id=submit
+    Wait For Element   css=.issue_list   # Assuming there's a way to check the issue was created
+
+Test Case-2 Update name of issue
+    [Documentation]    Verify that a user can update the name of an existing issue.
+                        Tags: Issue Management, CRUD, Update, Positive
+                        Precondition: An issue with the title (${FIRST_ISSUE_TITLE}) exists.
+                        Test Data: Updated issue title (${UPDATED_ISSUE_TITLE}).
+                        Process Test Steps:
+                        1. Open the issue details.
+                        2. Click 'Edit'.
+                        3. Change the issue title.
+                        4. Click 'Save Changes'.
+                        5. Verify the update message.
+                        Expected Result: Name of the title should change.
+                        [Placeholder for manual notes:
+                        Actual Result: No update confirmation message; issue title visually confirmed to change in the UI.
+                        Status: Pass with observations]
+    [Tags]             CRUD, Update, Positive
+    Click Link         ${FIRST_ISSUE_TITLE}
+    Click Button       id=edit_issue
+    Input Text         id=issue_title    ${UPDATED_ISSUE_TITLE}
+    Click Button       id=save_changes
+    Wait For Element   css=.issue_title   # Assuming the title in the UI changes
+
+Test Case-3 Create second issue with previous updated name
+    [Documentation]    Verify that a user can create another issue with the name of an updated previous issue.
+                        Tags: Issue Management, CRUD, Create, Positive
+                        Precondition: An issue with the updated title (${UPDATED_ISSUE_TITLE}) exists.
+                        Test Data: Issue title (${SECOND_ISSUE_TITLE}).
+                        Process Test Steps:
+                        1. Click 'Create New Issue'.
+                        2. Input the issue title using the updated name of the first issue.
+                        3. Submit the issue creation form.
+                        4. Verify the creation message.
+                        Expected Result: 'Second issue with the same name is created.'
+                        [Placeholder for manual notes:
+                        Actual Result: Second issue with the same name is created, but there are no confirmation messages of any kind.
+                        Status: Pass with observations]
+    [Tags]             CRUD, Create, Positive
+    Click Button       id=new_issue
+    Input Text         id=issue_title    ${SECOND_ISSUE_TITLE}
+    Click Button       id=submit
+    Wait For Element   css=.issue_list   # Check that the new issue appears
+
+Test Case-4 Delete first issue
+    [Documentation]    Verify that a user can delete an existing issue.
+                        Tags: Issue Management, CRUD, Delete, Positive
+                        Precondition: An issue with the title (${UPDATED_ISSUE_TITLE}) exists.
+                        Test Data: None.
+                        Process Test Steps:
+						1. Choose the issue
+                        1. Navigate to triple dots at the top right side of the issue page.
+                        2. Click 'Delete Issue'.
+                        3. Confirm the deletion.
+                        4. Verify the deletion message.
+                        Expected Result: 'The Issue was successfully deleted' message is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: To be filled post-execution.
+                        Status: To be determined by 'Element Should Contain'.]
+    [Tags]             CRUD, Delete, Positive
+    Click Link         ${UPDATED_ISSUE_TITLE}
+    Click Button       id=delete_issue
+    Confirm Action
+    ${actual_msg}=     Get Text    css=.notification
+    Element Should Contain   ${actual_msg}    "The Issue was successfully deleted"
+
+*** Keywords ***
+Open Browser To Issues Page
+    Open Browser    ${ISSUE_TRACKER_URL}    ${BROWSER}
+    Maximize Browser Window
+    Wait Until Element Is Visible    css=#issue_tracker    30s

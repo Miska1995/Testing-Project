@@ -1,0 +1,161 @@
+
+#******************** Settings ************************
+
+*** Settings ***
+
+# TODO: Write Dcocumentation e.g. Project Test scenario. CRUD Operation: Create, Read, Update, Delete
+
+Documentation	
+
+# TODO: Write Precondition, Postcondition, Tags
+
+Pre Condition	 
+Post Condition	
+Tags
+
+#******************* Common Variables ********************
+
+*** Variables ***
+
+# NOTE: Please Remove your login credential before uploading Assignments
+
+# TODO: Write Project creation field variables
+
+
+
+#******************** Test Cases *************************
+
+*** Test Case ***
+
+# TODO: Write Positive and Negative Test Cases and Test Process steps
+
+# Positive Test examples are below write test process steps for each below test case
+
+	Create blank project
+	Create template project 
+	Update name of template project
+	Delete template project
+	Valide that message is showing Project 'First project ' was successfully created.
+
+# Negative Test examples are below write test process steps for each below test case
+
+	Create a blank project with the previous same name
+
+
+*MY PROJECT WORK STARTS HERE*
+
+*** Settings ***
+Library           SeleniumLibrary
+Suite Setup       Open Browser To Project Creation Page
+Suite Teardown    Close All Browsers
+Documentation     Project Management Test Scenario
+...               This test suite performs CRUD operations on projects, testing Create, Read, Update, and Delete functionalities.
+...               Preconditions: User is on the Project Creation page.
+...               Postconditions: All test projects are cleaned up; the user logs out.
+...               Tags: CRUD, Project Management
+
+*** Variables ***
+${LOGIN_URL}               https://gitlab.com/login
+${PROJECT_CREATION_URL}    https://gitlab.com/projects/new
+${BLANK_PROJECT_URL}       https://gitlab.com/projects/new#blank_project
+${TEMPLATE_PROJECT_URL}    https://gitlab.com/projects/new#create_from_template
+${PROJECT_NAME}            FirstProject
+${NEW_PROJECT_NAME}        UpdatedFirstProject
+${TEMPLATE_PROJECT_NAME}   TemplateProject
+${BROWSER}                 Microsoft Edge
+
+*** Test Cases ***
+
+Test Case-1 Create blank project
+    [Documentation]    Verify that a user can successfully create a blank project.
+                        Document: This test verifies the creation of a project without pre-defined templates.
+                        Tags: CRUD, Create, Positive
+                        Precondition: User must be on the Project Creation page.
+                        Test Data: None.
+                        Process Test Steps:
+                        1. Navigate to the blank project creation URL.
+                        2. Submit the project creation form.
+                        3. Verify the success message.
+                        Expected Result: 'Project "FirstProject" was successfully created' is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: I got an message displaying "FirsProject was successfully created"
+                        Status: Pass]
+    [Tags]             CRUD, Create, Positive
+    Go To              ${BLANK_PROJECT_URL}
+    Submit Form        css=#new_project_form
+    ${actual_msg}=     Get Text    css=.notification
+    Should Contain    ${actual_msg}    "FirstProject was successfully created"
+
+
+Test Case-2 Create template project
+    [Documentation]    Verify that a user can create a project using a template.
+                        Document: This test verifies the creation of a project from a template.
+                        Tags: CRUD, Create, Positive
+                        Precondition: User must be on the Project Creation page.
+                        Test Data: Template project name.
+                        Process Test Steps:
+                        1. Navigate to the template project creation URL.
+                        2. Select a template.
+                        3. Submit the project creation form.
+                        4. Verify the success message.
+                        Expected Result: 'The project was successfully imported' is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: I got an message displaying "The project was successfully imported"
+                        Status: Pass]
+    [Tags]             CRUD, Create, Positive
+    Go To              ${TEMPLATE_PROJECT_URL}
+    Select From List   id=template_selector    ${TEMPLATE_PROJECT_NAME}
+    Submit Form        css=#new_project_form
+    ${actual_msg}=     Get Text    css=.notification
+    Should Contain    ${actual_msg}     "The project was successfully imported"
+
+Test Case-3 Update name of template project
+    [Documentation]    Verify that a user can update the name of an existing template project.
+                        Document: This test verifies the update functionality for project names.
+                        Tags: CRUD, Update, Positive
+                        Precondition: Template project exists.
+                        Test Data: New project name 'UpdatedFirstProject'.
+                        Process Test Steps:
+                        1. Go to project settings.
+                        2. Update the project name.
+                        3. Submit the update form.
+                        4. Verify the update message.
+                        Expected Result: 'Project UpdatedFirstProject was successfully updated' is displayed.
+                        [Placeholder for manual notes:
+                        Actual Result: I got an message displaying "Project TemplateProject was successfully updated"
+                        Status: Pass.]
+    [Tags]             CRUD, Update, Positive
+    Go To              ${PROJECT_CREATION_URL}/${TEMPLATE_PROJECT_NAME}/settings
+    Input Text         id=project_name    ${NEW_PROJECT_NAME}
+    Submit Form        css=#update_project_form
+    ${actual_msg}=     Get Text    css=.notification
+    Should Contain    ${actual_msg}     "Project UpdatedFirstProject was successfully updated"
+
+Test Case-4 Delete template project
+    [Documentation]    Verify that a user can delete an existing template project.
+                        Document: This test checks the delete functionality for projects.
+                        Tags: CRUD, Delete, Positive
+                        Precondition: Template project exists.
+                        Test Data: None.
+                        Process Test Steps:
+                        1. Navigate to the project settings.
+						2. Further navigate to 'Advanced' option.
+                        3. Initiate project deletion.
+                        4. Confirm the deletion by entering the project name.
+                        5. Verify the deletion message.
+                        Expected Result: 'Project UpdatedFirstProject will be deleted on 2024-05-08'
+                        [Placeholder for manual notes:
+                        Actual Result: I got an message displaying "Project TemplateProject will be deleted on 2024-05-08
+                        Status: Pass]
+    [Tags]             CRUD, Delete, Positive
+    Go To              ${PROJECT_CREATION_URL}/${TEMPLATE_PROJECT_NAME}/settings
+    Click Button       id=delete_project
+    Confirm Action
+    ${actual_msg}=     Get Text    css=.notification
+    Should Contain    ${actual_msg}     "'Project TemplateProject will be deleted on 2024-05-08"
+
+*** Keywords ***
+Open Browser To Project Creation Page
+    Open Browser    ${PROJECT_CREATION_URL}    ${BROWSER}
+    Maximize Browser Window
+    Wait Until Element Is Visible    css=#new_project_form    30s
